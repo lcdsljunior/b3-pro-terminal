@@ -170,6 +170,8 @@ def analisar_oportunidade(preco, minima, maxima, var_pct):
 @st.cache_data(ttl=30)
 def carregar_dados_mercado(tickers):
     dados = []
+    hora_atualizacao = datetime.now().strftime("%H:%M:%S")
+
     for ticker in tickers:
         ticker_sa = f"{ticker}.SA" if not ticker.endswith(".SA") else ticker
         ativo = yf.Ticker(ticker_sa)
@@ -200,7 +202,8 @@ def carregar_dados_mercado(tickers):
             "Mín.": minima,
             "Avaliação": recomendacao,
         })
-    return pd.DataFrame(dados)
+
+    return pd.DataFrame(dados), hora_atualizacao
 
 
 # Modal Popup do Ranking Tático de Compras
@@ -293,7 +296,7 @@ st.markdown(
 
 # --- ABAS DE NAVEGAÇÃO PRINCIPAL ---
 aba_mercado, aba_carteira = st.tabs(
-    ["📊 Monitor de Mercado (B3)", "💼 Minha Carteira (SQLite)"]
+    ["📊 Monitor de Mercado (B3)", "💼 Minha Carteira"]
 )
 
 # ==========================================
@@ -315,7 +318,10 @@ with aba_mercado:
         btn_ranking = st.button("🏆 RANKING", use_container_width=True)
 
     with st.spinner("Sincronizando com a B3..."):
-        df_mercado = carregar_dados_mercado(lista_t)
+        df_mercado, ultima_atualizacao = carregar_dados_mercado(lista_t)
+
+    # Exibição do horário da última atualização
+    st.caption(f"🕒 **Última atualização:** {ultima_atualizacao}")
 
     if btn_ranking:
         abrir_modal_ranking(df_mercado)
@@ -379,7 +385,7 @@ with aba_carteira:
         )
     else:
         tickers_carteira = df_db["simbolo"].tolist()
-        df_cotacoes = carregar_dados_mercado(tickers_carteira)
+        df_cotacoes, _ = carregar_dados_mercado(tickers_carteira)
         mapa_p = dict(
             zip(df_cotacoes["Símbolo"], df_cotacoes["Preço_Num"])
         )
