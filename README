@@ -1,0 +1,63 @@
+Documentação Técnica do Sistema
+📖 1. Visão Geral do Sistema
+O B3 Pro Terminal & Carteira é uma aplicação web desenvolvida em Python utilizando o framework Streamlit. O sistema foi concebido para atender investidores que realizam aportes graduais (estratégia de médio/longo prazo), permitindo o monitoramento em tempo real de ativos listados na B3 (Ações e Fundos Imobiliários) e o gerenciamento automatizado de uma carteira pessoal persistida em banco de dados local.
+
+⚙️ 2. Arquitetura e Tecnologias Empregadas
+Linguagem Principal: Python 3.10+
+
+Interface Gráfica (Frontend): Streamlit (com customizações avançadas em CSS injetado para garantir responsividade e tema Dark Pro).
+
+Fontes e Tipografia: Combinação de Inter para interface geral e JetBrains Mono com números tabulares (tabular-nums) para alinhamento preciso de preços, quantidades e valores financeiros em tabelas e inputs.
+
+Coleta de Dados de Mercado: Biblioteca yfinance (Yahoo Finance API) para obtenção de cotações, variações diárias, máximas, mínimas e volumes em tempo real.
+
+Armazenamento de Dados (Backend): SQLite (carteira.db) para persistência local leve, segura e sem necessidade de servidores externos.
+
+Manipulação de Dados: Pandas para estruturação, ordenação e cálculo de indicadores financeiros.
+
+📂 3. Estrutura do Banco de Dados (carteira.db)
+O sistema cria automaticamente uma tabela relacional chamada carteira com os seguintes campos:
+
+id: Chave primária autoincrementada.
+
+simbolo: Ticker do ativo (ex: BBAS3, VGIR11), configurado como único (UNIQUE).
+
+quantidade: Número de cotas ou ações acumuladas.
+
+preco_medio: Preço médio ponderado de aquisição calculado automaticamente pelo sistema a cada nova compra registrada.
+
+🚀 4. Manual de Funcionalidades
+Monitor de Mercado (Aba 1):
+
+Exibe a lista de ativos configurados.
+
+Calcula a variação percentual e nominal em relação ao fechamento anterior.
+
+Algoritmo de Oportunidade Tática: Avalia o comportamento diário do preço em relação à mínima e variação para classificar o ativo em:
+
+🟢 BOA PARA COMPRAR (queda acentuada próxima à mínima do dia).
+
+🔴 AGUARDAR (ativo esticado no dia).
+
+🟡 NEUTRO (movimento lateral ou sem desconto relevante).
+
+Ranking Tático: Abre um painel ordenando todos os ativos monitorados por prioridade de compra.
+
+Minha Carteira (Aba 2):
+
+Cadastro Rápido: Formulário direto para registrar novas compras informando o Ticker, Quantidade e Preço Pago.
+
+Cálculo de Preço Médio Ponderado: Caso o usuário compre o mesmo ativo novamente em datas diferentes, o banco atualiza a quantidade somada e recalcula o preço médio de forma proporcional.
+
+Simulação de P&L (Profit and Loss): Cruzamento dos dados gravados com o preço atual da B3 ao vivo, exibindo o capital investido, valor atual de mercado, lucro/prejuízo em Reais (R$) e rentabilidade percentual (%).
+
+Exclusão de Ativos: Opção para selecionar qualquer ativo da base e removê-lo definitivamente do banco SQLite.
+
+📱 5. Requisitos de Execução e Responsividade
+Compatível com navegadores modernos em Smartphones, Tablets, Notebooks e Desktops.
+
+Para executar localmente no terminal:
+
+Bash
+pip install streamlit yfinance pandas
+streamlit run app.py
