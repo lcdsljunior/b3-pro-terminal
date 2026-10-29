@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import sqlite3
 import pandas as pd
 import streamlit as st
@@ -170,7 +170,7 @@ def analisar_oportunidade(preco, minima, maxima, var_pct):
 @st.cache_data(ttl=30)
 def carregar_dados_mercado(tickers):
     dados = []
-    hora_atualizacao = datetime.now().strftime("%H:%M:%S")
+    hora_atualizacao = (datetime.utcnow() - timedelta(hours=3)).strftime("%H:%M:%S")
 
     for ticker in tickers:
         ticker_sa = f"{ticker}.SA" if not ticker.endswith(".SA") else ticker
